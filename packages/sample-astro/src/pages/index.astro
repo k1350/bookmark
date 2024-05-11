@@ -1,0 +1,11 @@
+---
+import { Page } from "../components/Page";
+import Layout from "../components/layout.astro";
+---
+
+<Layout title="Page1">
+  <div>
+    <a href="/2">Page2</a>
+  </div>
+  <Page title="サンプル本文" client:load />
+</Layout>

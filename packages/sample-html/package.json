@@ -1,0 +1,12 @@
+{
+  "name": "packages-sample-html",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "http-server",
+    "lint": "biome check --apply ."
+  },
+  "devDependencies": {
+    "globals": "^15.2.0",
+    "http-server": "^14.1.1"
+  }
+}

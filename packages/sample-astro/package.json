@@ -1,0 +1,23 @@
+{
+  "name": "packages-sample-astro",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "lint": "biome check --apply ."
+  },
+  "dependencies": {
+    "@astrojs/preact": "^3.3.0",
+    "@k1350/novel-bookmark": "workspace:*",
+    "astro": "^4.8.2",
+    "preact": "^10.21.0",
+    "sass": "^1.77.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

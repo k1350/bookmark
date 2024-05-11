@@ -1,0 +1,19 @@
+{
+  "name": "bookmark",
+  "workspaces": ["packages/*"],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "prepare": "lefthook install",
+    "build": "bun run --filter @k1350/novel-bookmark build",
+    "out": "bun run --filter @k1350/novel-bookmark out && cp ./packages/novel-bookmark/out/index.min.js ./packages/sample-html/public/js/novel-bookmark/index.min.js",
+    "dev:astro": "bun run --filter packages-sample-astro dev",
+    "dev:html": "bun run --filter packages-sample-html dev",
+    "lint": "bun run --filter '*' lint && biome check --apply ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.7.3",
+    "lefthook": "^1.6.10"
+  }
+}

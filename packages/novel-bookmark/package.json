@@ -1,0 +1,31 @@
+{
+  "name": "@k1350/novel-bookmark",
+  "version": "0.0.1",
+  "homepage": "https://github.com/k1350/bookmark",
+  "description": "A library that allows you to build a bookmark system for your web site.",
+  "type": "module",
+  "license": "CC0-1.0",
+  "author": "k1350",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/k1350/bookmark.git",
+    "directory": "packages/novel-bookmark"
+  },
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup && tsc --project tsconfig.build.json",
+    "out": "tsup --config tsup.out.config.ts && tsup --config tsup.out.min.config.ts",
+    "lint": "biome check --apply ."
+  },
+  "devDependencies": {
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5"
+  }
+}
