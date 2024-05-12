@@ -9,7 +9,7 @@ import {
 } from "@k1350/novel-bookmark";
 import { useEffect, useState } from "preact/hooks";
 import { BookmarkList } from "../BookmarkList";
-import styles from "./index.module.scss";
+import styles from "./index.module.css";
 
 type Props = {
   title: string;

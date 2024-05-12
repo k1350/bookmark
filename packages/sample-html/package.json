@@ -1,16 +1,9 @@
 {
   "name": "packages-sample-html",
   "version": "0.0.1",
-  "engines": {
-    "node": ">=20"
-  },
   "packageManager": "bun@1.1.8",
   "scripts": {
-    "dev": "http-server",
+    "dev": "bun --hot run server.js",
     "lint": "biome check --apply ."
-  },
-  "devDependencies": {
-    "globals": "^15.2.0",
-    "http-server": "^14.1.1"
   }
 }

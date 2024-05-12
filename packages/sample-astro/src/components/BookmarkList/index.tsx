@@ -3,7 +3,7 @@ import {
   onClickBookmarkLink,
   removeBookmark,
 } from "@k1350/novel-bookmark";
-import styles from "./index.module.scss";
+import styles from "./index.module.css";
 
 type Props = {
   bookmarks: Bookmark[];
