@@ -7,8 +7,8 @@
   "packageManager": "bun@1.1.8",
   "scripts": {
     "prepare": "lefthook install",
-    "build": "bun run --filter @k1350/novel-bookmark build",
-    "out": "bun run --filter @k1350/novel-bookmark out && cp ./packages/novel-bookmark/out/index.min.js ./packages/sample-html/public/js/novel-bookmark/index.min.js",
+    "build:npm": "bun run --filter @k1350/novel-bookmark build",
+    "build:browser": "bun run --filter packages-novel-bookmark-browser build && cp ./packages/novel-bookmark-browser/dist/index.min.js ./packages/sample-html/public/js/novel-bookmark/index.min.js",
     "dev:astro": "bun run --filter packages-sample-astro dev",
     "dev:html": "bun run --filter packages-sample-html dev",
     "lint": "bun run --filter '*' lint && biome check --apply ."

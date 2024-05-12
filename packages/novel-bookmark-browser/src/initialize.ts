@@ -1,4 +1,4 @@
-import { observe, scrollToParagraph } from "../index.js";
+import { observe, scrollToParagraph } from "novel-bookmark/index.js";
 
 export function initialize() {
   let disconnect: (() => void) | null = null;

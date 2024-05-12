@@ -1,10 +1,10 @@
-// src/constants.ts
+// ../novel-bookmark/src/constants.ts
 var MAX_BOOKMARKS = 100;
 var NOVEL_BOOKMARK_P_ID_PREFIX = "element-p-";
 var NOVEL_BOOKMARK_P_DATA_NAME = "data-novel-bookmark-id";
 var NOVEL_BOOKMARK_INTERSECTING_DATA_NAME = "data-novel-bookmark-intersecting";
 
-// src/observe.ts
+// ../novel-bookmark/src/observe.ts
 function observe({
   paragraphTag = "p",
   ...props
@@ -48,7 +48,7 @@ function setIdAndIntersectionObserver({
   return intersectionObserver;
 }
 
-// src/storage.ts
+// ../novel-bookmark/src/storage.ts
 var STORAGE_ID = "novel-bookmarks";
 var TEMP_STORAGE_ID = "novel-bookmark-p-id";
 function setItemToStorage({ type, key, value }) {
@@ -94,7 +94,7 @@ function removeBookmarkFromStorage() {
   removeItemFromStorage({ type: "local", key: STORAGE_ID });
 }
 
-// src/scrollToParagraph.ts
+// ../novel-bookmark/src/scrollToParagraph.ts
 function scrollToParagraph() {
   const id = getParagraphIdFromStorage();
   if (!id)
@@ -108,7 +108,7 @@ function scrollToParagraph() {
   element.scrollIntoView({ behavior: "smooth" });
 }
 
-// src/getBookmarks.ts
+// ../novel-bookmark/src/getBookmarks.ts
 function getBookmarks() {
   const storageData = getBookmarksFromStorage() ?? "[]";
   const parsedStorageData = JSON.parse(storageData);
@@ -121,7 +121,7 @@ function isBookmark(data) {
   return "title" in data && typeof data.title === "string" && "url" in data && typeof data.url === "string";
 }
 
-// src/isBookmarked.ts
+// ../novel-bookmark/src/isBookmarked.ts
 function isBookmarked() {
   const currentBookmarks = getBookmarks();
   return currentBookmarks.some(
@@ -129,7 +129,7 @@ function isBookmarked() {
   );
 }
 
-// src/addBookmark.ts
+// ../novel-bookmark/src/addBookmark.ts
 function addBookmark(id) {
   const currentBookmarks = getBookmarks();
   if (currentBookmarks.length >= MAX_BOOKMARKS) {
@@ -155,7 +155,7 @@ function addBookmark(id) {
   setBookmarkToStorage(currentBookmarks);
 }
 
-// src/removeBookmark.ts
+// ../novel-bookmark/src/removeBookmark.ts
 function removeBookmark(bookmark) {
   const currentBookmarks = getBookmarks();
   const filteredBookmarks = currentBookmarks.filter(
@@ -168,14 +168,14 @@ function removeBookmark(bookmark) {
   removeBookmarkFromStorage();
 }
 
-// src/onClickBookmarkLink.ts
+// ../novel-bookmark/src/onClickBookmarkLink.ts
 function onClickBookmarkLink(bookmark) {
   if (bookmark.id) {
     setParagraphIdToStorage(bookmark.id);
   }
 }
 
-// src/browser/initialize.ts
+// src/initialize.ts
 function initialize() {
   let disconnect = null;
   if (document.readyState !== "loading") {
@@ -208,11 +208,11 @@ function initialize() {
   );
 }
 
-// src/browser/constants.ts
+// src/constants.ts
 var BookmarkButtonId = "NovelBookmarkButton";
 var BookmarkListId = "NovelBookmarkList";
 
-// src/browser/createBookmarkButton.ts
+// src/createBookmarkButton.ts
 function createBookmarkButton({
   parentElement = document.body,
   className = "NovelBookmarkButton",
@@ -242,7 +242,7 @@ function createBookmarkButton({
   parentElement.appendChild(button);
 }
 
-// src/browser/createBookmarkList.ts
+// src/createBookmarkList.ts
 function onRemoveButtonClick({
   bookmark,
   notBookmarkedText = "Add Bookmark",

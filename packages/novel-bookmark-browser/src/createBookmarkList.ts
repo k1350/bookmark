@@ -4,7 +4,7 @@ import {
   isBookmarked,
   onClickBookmarkLink,
   removeBookmark,
-} from "../index.js";
+} from "novel-bookmark/index.js";
 import { BookmarkButtonId, BookmarkListId } from "./constants.js";
 import type { CreateBookmarkListProps } from "./types.js";
 

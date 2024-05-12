@@ -1,4 +1,8 @@
-import { addBookmark, isBookmarked, removeBookmark } from "../index.js";
+import {
+  addBookmark,
+  isBookmarked,
+  removeBookmark,
+} from "novel-bookmark/index.js";
 import { BookmarkButtonId } from "./constants.js";
 import type { CreateBookmarkButtonProps } from "./types.js";
 

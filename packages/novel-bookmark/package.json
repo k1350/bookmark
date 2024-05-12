@@ -25,7 +25,6 @@
   "packageManager": "bun@1.1.8",
   "scripts": {
     "build": "tsup && tsc --project tsconfig.build.json",
-    "out": "tsup --config tsup.out.config.ts && tsup --config tsup.out.min.config.ts",
     "lint": "biome check --apply ."
   },
   "devDependencies": {
