@@ -9,7 +9,7 @@ import type { CreateBookmarkButtonProps } from "./types.js";
 /**
  * ブックマークボタンを作成する
  */
-export function createBookmarkButton({
+export async function createBookmarkButton({
   parentElement = document.body,
   className = "NovelBookmarkButton",
   bookmarkedText = "Remove Bookmark",
@@ -20,21 +20,26 @@ export function createBookmarkButton({
   button.type = "button";
   button.id = BookmarkButtonId;
   button.classList.add(className);
-  const bookmarked = isBookmarked();
+  const bookmarked = await isBookmarked(window.location.href);
   button.textContent = bookmarked ? bookmarkedText : notBookmarkedText;
   button.dataset.bookmarked = bookmarked ? "true" : "false";
 
   button.addEventListener("click", () => {
-    if (isBookmarked()) {
-      removeBookmark();
-      button.textContent = notBookmarkedText;
-      button.dataset.bookmarked = "false";
-    } else {
-      addBookmark();
-      button.textContent = bookmarkedText;
-      button.dataset.bookmarked = "true";
-    }
-    onClick?.();
+    isBookmarked(window.location.href).then((isBookmarked) => {
+      if (isBookmarked) {
+        removeBookmark(window.location.href).then(() => {
+          button.textContent = notBookmarkedText;
+          button.dataset.bookmarked = "false";
+          onClick?.();
+        });
+      } else {
+        addBookmark().then(() => {
+          button.textContent = bookmarkedText;
+          button.dataset.bookmarked = "true";
+          onClick?.();
+        });
+      }
+    });
   });
 
   parentElement.appendChild(button);

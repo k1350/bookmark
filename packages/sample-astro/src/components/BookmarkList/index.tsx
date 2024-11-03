@@ -18,8 +18,9 @@ export function BookmarkList({ bookmarks, onRemoveBookmark }: Props) {
           <button
             type="button"
             onClick={() => {
-              removeBookmark(bookmark);
-              onRemoveBookmark();
+              removeBookmark(bookmark.url).then(() => {
+                onRemoveBookmark();
+              });
             }}
           >
             削除

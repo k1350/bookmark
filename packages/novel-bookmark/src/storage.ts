@@ -1,6 +1,3 @@
-import type { Bookmark } from "./types";
-
-const STORAGE_ID = "novel-bookmarks";
 const TEMP_STORAGE_ID = "novel-bookmark-p-id";
 
 type LocalStorageType = "local";
@@ -9,7 +6,7 @@ type StorageType = LocalStorageType | SessionStorageType;
 
 type SetItemToStorageProps = {
   type: StorageType;
-  key: typeof STORAGE_ID | typeof TEMP_STORAGE_ID;
+  key: typeof TEMP_STORAGE_ID;
   value: string;
 };
 function setItemToStorage({ type, key, value }: SetItemToStorageProps) {
@@ -21,7 +18,7 @@ function setItemToStorage({ type, key, value }: SetItemToStorageProps) {
 
 type GetItemToStorageProps = {
   type: StorageType;
-  key: typeof STORAGE_ID | typeof TEMP_STORAGE_ID;
+  key: typeof TEMP_STORAGE_ID;
 };
 function getItemFromStorage({
   type,
@@ -35,7 +32,7 @@ function getItemFromStorage({
 
 type RemoveItemToStorageProps = {
   type: StorageType;
-  key: typeof STORAGE_ID | typeof TEMP_STORAGE_ID;
+  key: typeof TEMP_STORAGE_ID;
 };
 function removeItemFromStorage({ type, key }: RemoveItemToStorageProps) {
   if (type === "local") {
@@ -44,23 +41,9 @@ function removeItemFromStorage({ type, key }: RemoveItemToStorageProps) {
   return sessionStorage.removeItem(key);
 }
 
-/** localStorage にブックマークを保存する */
-export function setBookmarkToStorage(bookmarks: Bookmark[]) {
-  setItemToStorage({
-    type: "local",
-    key: STORAGE_ID,
-    value: JSON.stringify(bookmarks),
-  });
-}
-
 /** sessionStorage にパラグラフID を保存する */
 export function setParagraphIdToStorage(id: string) {
   setItemToStorage({ type: "session", key: TEMP_STORAGE_ID, value: id });
-}
-
-/** localStorage からブックマークを取得する */
-export function getBookmarksFromStorage(): string | null {
-  return getItemFromStorage({ type: "local", key: STORAGE_ID });
 }
 
 /** sessionStorage からパラグラフID を取得して削除する */
@@ -68,9 +51,4 @@ export function getParagraphIdFromStorage(): string | null {
   const id = getItemFromStorage({ type: "session", key: TEMP_STORAGE_ID });
   removeItemFromStorage({ type: "session", key: TEMP_STORAGE_ID });
   return id;
-}
-
-/** localStorage からブックマークを削除する */
-export function removeBookmarkFromStorage() {
-  removeItemFromStorage({ type: "local", key: STORAGE_ID });
 }

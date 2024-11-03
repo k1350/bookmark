@@ -1,9 +1,8 @@
-import { getBookmarks } from "./getBookmarks";
+import { getFromDatabase } from "./database";
+import { isBookmark } from "./typeGuard";
 
 /** ブックマーク済みかどうかを返す */
-export function isBookmarked(): boolean {
-  const currentBookmarks = getBookmarks();
-  return currentBookmarks.some(
-    (bookmark) => bookmark.url === window.location.href,
-  );
+export async function isBookmarked(url: string): Promise<boolean> {
+  const bookmark = await getFromDatabase(url, isBookmark);
+  return !!bookmark;
 }

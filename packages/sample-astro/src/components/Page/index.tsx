@@ -17,10 +17,15 @@ type Props = {
 
 export function Page({ title }: Props) {
   const [bookmarked, setBookmarked] = useState(false);
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>();
+
   useEffect(() => {
-    setBookmarked(isBookmarked());
-    setBookmarks(getBookmarks());
+    async function init() {
+      setBookmarked(await isBookmarked(window.location.href));
+      setBookmarks(await getBookmarks());
+    }
+    init();
+
     const disconnect = observe({ wrapperClass: "Novel" });
     if (!disconnect) return;
     scrollToParagraph();
@@ -35,12 +40,16 @@ export function Page({ title }: Props) {
   });
   return (
     <>
-      {bookmarks.length > 0 && (
+      {bookmarks && bookmarks.length > 0 && (
         <BookmarkList
           bookmarks={bookmarks}
           onRemoveBookmark={() => {
-            setBookmarks(getBookmarks());
-            setBookmarked(isBookmarked());
+            getBookmarks()
+              .then((bookmarks) => {
+                setBookmarks(bookmarks);
+                return isBookmarked(window.location.href);
+              })
+              .then((bookmarked) => setBookmarked(bookmarked));
           }}
         />
       )}
@@ -48,7 +57,9 @@ export function Page({ title }: Props) {
         <h1>{title}</h1>
         <div className="Novel">
           {data.map((item) => (
-            <p key={item.id}>{item.content}</p>
+            <p key={item.id} className={styles.NovelParagraph}>
+              {item.content}
+            </p>
           ))}
         </div>
         <button
@@ -56,12 +67,23 @@ export function Page({ title }: Props) {
           className={styles.BookmarkButton}
           onClick={() => {
             if (bookmarked) {
-              removeBookmark();
+              removeBookmark(window.location.href)
+                .then(() => {
+                  return getBookmarks();
+                })
+                .then((bookmarks) => {
+                  setBookmarks(bookmarks);
+                });
             } else {
-              addBookmark();
+              addBookmark()
+                .then(() => {
+                  return getBookmarks();
+                })
+                .then((bookmarks) => {
+                  setBookmarks(bookmarks);
+                });
             }
             setBookmarked((prev) => !prev);
-            setBookmarks(getBookmarks());
           }}
         >
           {bookmarked ? "ブックマーク解除" : "ブックマークする"}

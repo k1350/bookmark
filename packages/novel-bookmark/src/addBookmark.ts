@@ -3,12 +3,16 @@ import {
   NOVEL_BOOKMARK_INTERSECTING_DATA_NAME,
   NOVEL_BOOKMARK_P_ID_PREFIX,
 } from "./constants";
+import { addToDatabase } from "./database";
 import { getBookmarks } from "./getBookmarks";
-import { setBookmarkToStorage } from "./storage";
+import { isBookmarked } from "./isBookmarked";
 
 /** ブックマークする */
-export function addBookmark(id?: string): void {
-  const currentBookmarks = getBookmarks();
+export async function addBookmark(): Promise<void> {
+  const alreadyBookmarked = await isBookmarked(window.location.href);
+  if (alreadyBookmarked) return;
+
+  const currentBookmarks = await getBookmarks();
   if (currentBookmarks.length >= MAX_BOOKMARKS) {
     return;
   }
@@ -25,13 +29,14 @@ export function addBookmark(id?: string): void {
     ),
   );
 
-  currentBookmarks.push({
+  await addToDatabase({
     title: document.title,
     url: window.location.href,
     id:
       intersectingIds.length > 0
         ? `${NOVEL_BOOKMARK_P_ID_PREFIX}${Math.min(...intersectingIds)}`
         : undefined,
+  }).catch((event) => {
+    console.error("addToDatabase error", event);
   });
-  setBookmarkToStorage(currentBookmarks);
 }

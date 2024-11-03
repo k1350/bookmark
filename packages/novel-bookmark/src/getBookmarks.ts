@@ -1,24 +1,11 @@
-import { getBookmarksFromStorage } from "./storage";
+import { getAllFromDatabase } from "./database";
+import { isBookmark } from "./typeGuard";
 import type { Bookmark } from "./types";
 
 /** ブックマークを取得する */
-export function getBookmarks(): Bookmark[] {
-  const storageData = getBookmarksFromStorage() ?? "[]";
-  const parsedStorageData = JSON.parse(storageData);
-  return Array.isArray(parsedStorageData)
-    ? parsedStorageData.filter((item) => isBookmark(item))
-    : [];
-}
-
-/** Bookmark 型ガード */
-function isBookmark(data: unknown): data is Bookmark {
-  if (typeof data !== "object" || data === null) {
-    return false;
-  }
-  return (
-    "title" in data &&
-    typeof data.title === "string" &&
-    "url" in data &&
-    typeof data.url === "string"
-  );
+export async function getBookmarks(): Promise<Bookmark[]> {
+  return getAllFromDatabase(isBookmark).catch((event) => {
+    console.error("getBookmarks error", event);
+    return [];
+  });
 }

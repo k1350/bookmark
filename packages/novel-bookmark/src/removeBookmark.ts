@@ -1,17 +1,9 @@
-import { getBookmarks } from "./getBookmarks";
-import { removeBookmarkFromStorage, setBookmarkToStorage } from "./storage";
-import type { Bookmark } from "./types";
+import { deleteFromDatabase } from "./database";
+import { isBookmarked } from "./isBookmarked";
 
 /** ブックマークを解除する */
-export function removeBookmark(bookmark?: Bookmark): void {
-  const currentBookmarks = getBookmarks();
-  const filteredBookmarks = currentBookmarks.filter(
-    (currentBookmark) =>
-      currentBookmark.url !== (bookmark ? bookmark.url : window.location.href),
-  );
-  if (filteredBookmarks.length > 0) {
-    setBookmarkToStorage(filteredBookmarks);
-    return;
-  }
-  removeBookmarkFromStorage();
+export async function removeBookmark(url: string): Promise<void> {
+  const alreadyBookmarked = await isBookmarked(url);
+  if (!alreadyBookmarked) return;
+  await deleteFromDatabase(url);
 }

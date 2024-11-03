@@ -11,28 +11,29 @@ import type { CreateBookmarkListProps } from "./types.js";
 /**
  * ブックマーク削除ボタンがクリックされたときの処理
  */
-function onRemoveButtonClick({
+async function onRemoveButtonClick({
   bookmark,
   notBookmarkedText = "Add Bookmark",
   ...props
 }: CreateBookmarkListProps & {
   bookmark: Bookmark;
 }) {
-  removeBookmark(bookmark);
+  await removeBookmark(bookmark.url);
 
   const bookmarkButton = document.getElementById(BookmarkButtonId);
-  if (bookmarkButton && !isBookmarked()) {
+  const bookmarked = await isBookmarked(window.location.href);
+  if (bookmarkButton && !bookmarked) {
     bookmarkButton.textContent = notBookmarkedText;
     bookmarkButton.dataset.bookmarked = "false";
   }
 
-  createBookmarkList({ notBookmarkedText, ...props });
+  await createBookmarkList({ notBookmarkedText, ...props });
 }
 
 /**
  * ブックマーク一覧作成
  */
-export function createBookmarkList({
+export async function createBookmarkList({
   parentElement = document.body,
   className = "NovelBookmarkList",
   noBookmarkText = "No bookmarks",
@@ -41,7 +42,7 @@ export function createBookmarkList({
 }: CreateBookmarkListProps) {
   document.getElementById(BookmarkListId)?.remove();
 
-  const bookmarks = getBookmarks();
+  const bookmarks = await getBookmarks();
 
   const div = document.createElement("div");
   div.id = BookmarkListId;

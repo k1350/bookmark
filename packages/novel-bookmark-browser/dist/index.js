@@ -49,7 +49,6 @@ function setIdAndIntersectionObserver({
 }
 
 // ../novel-bookmark/src/storage.ts
-var STORAGE_ID = "novel-bookmarks";
 var TEMP_STORAGE_ID = "novel-bookmark-p-id";
 function setItemToStorage({ type, key, value }) {
   if (type === "local") {
@@ -72,26 +71,13 @@ function removeItemFromStorage({ type, key }) {
   }
   return sessionStorage.removeItem(key);
 }
-function setBookmarkToStorage(bookmarks) {
-  setItemToStorage({
-    type: "local",
-    key: STORAGE_ID,
-    value: JSON.stringify(bookmarks)
-  });
-}
 function setParagraphIdToStorage(id) {
   setItemToStorage({ type: "session", key: TEMP_STORAGE_ID, value: id });
-}
-function getBookmarksFromStorage() {
-  return getItemFromStorage({ type: "local", key: STORAGE_ID });
 }
 function getParagraphIdFromStorage() {
   const id = getItemFromStorage({ type: "session", key: TEMP_STORAGE_ID });
   removeItemFromStorage({ type: "session", key: TEMP_STORAGE_ID });
   return id;
-}
-function removeBookmarkFromStorage() {
-  removeItemFromStorage({ type: "local", key: STORAGE_ID });
 }
 
 // ../novel-bookmark/src/scrollToParagraph.ts
@@ -107,12 +93,142 @@ function scrollToParagraph() {
   element.scrollIntoView({ behavior: "smooth" });
 }
 
-// ../novel-bookmark/src/getBookmarks.ts
-function getBookmarks() {
-  const storageData = getBookmarksFromStorage() ?? "[]";
-  const parsedStorageData = JSON.parse(storageData);
-  return Array.isArray(parsedStorageData) ? parsedStorageData.filter((item) => isBookmark(item)) : [];
+// ../novel-bookmark/src/database.ts
+var DB_NAME = "novel-bookmarks";
+var DB_VERSION = 1;
+var DB_STORE_NAME = "novel-bookmarks-store";
+var _db;
+async function openDatabase() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onsuccess = function() {
+      _db = this.result;
+      resolve(_db);
+    };
+    req.onerror = (event) => {
+      reject(event);
+    };
+    req.onupgradeneeded = (event) => {
+      const eventTarget = event.target;
+      if (!eventTarget || !("result" in eventTarget)) {
+        console.error("openDatabase: event.target is invalid", eventTarget);
+        reject(event);
+        return;
+      }
+      const db = eventTarget.result;
+      if (!(db instanceof IDBDatabase)) {
+        console.error("openDatabase: event.target.result is invalid", db);
+        reject(event);
+        return;
+      }
+      db.createObjectStore(DB_STORE_NAME, {
+        keyPath: "url"
+      });
+    };
+  });
 }
+async function getDatabase() {
+  if (_db) return _db;
+  return openDatabase();
+}
+async function getTransaction(mode) {
+  const db = await getDatabase();
+  return db.transaction([DB_STORE_NAME], mode);
+}
+async function addToDatabase(item) {
+  const tx = await getTransaction("readwrite");
+  return new Promise((resolve, reject) => {
+    const request = tx.objectStore(DB_STORE_NAME).add(item);
+    tx.oncomplete = () => {
+      resolve();
+    };
+    request.onerror = (event) => {
+      reject(event);
+    };
+  });
+}
+async function deleteFromDatabase(key) {
+  const tx = await getTransaction("readwrite");
+  return new Promise((resolve, reject) => {
+    const request = tx.objectStore(DB_STORE_NAME).delete(key);
+    tx.oncomplete = () => {
+      resolve();
+    };
+    request.onerror = (event) => {
+      reject(event);
+    };
+  });
+}
+async function getAllFromDatabase(typeGuard) {
+  const tx = await getTransaction("readonly");
+  return new Promise((resolve, reject) => {
+    const request = tx.objectStore(DB_STORE_NAME).openCursor();
+    const items = [];
+    request.onsuccess = (event) => {
+      const eventTarget = event.target;
+      if (!eventTarget || !("result" in eventTarget)) {
+        console.error(
+          "getAllFromDatabase: event.target is invalid",
+          eventTarget
+        );
+        reject(event);
+        return;
+      }
+      const cursor = eventTarget.result;
+      if (cursor instanceof IDBCursorWithValue) {
+        if (typeGuard(cursor.value)) {
+          items.push(cursor.value);
+          cursor.continue();
+        } else {
+          console.error(
+            "getAllFromDatabase: event.target.result.value is invalid",
+            cursor.value
+          );
+          reject(event);
+        }
+      } else if (cursor === null) {
+        resolve(items);
+      } else {
+        console.error(
+          "getAllFromDatabase: event.target.result is invalid",
+          cursor
+        );
+        reject(event);
+      }
+    };
+    request.onerror = (event) => {
+      reject(event);
+    };
+  });
+}
+async function getFromDatabase(key, typeGuard) {
+  const tx = await getTransaction("readonly");
+  return new Promise((resolve, reject) => {
+    const request = tx.objectStore(DB_STORE_NAME).get(key);
+    request.onsuccess = (event) => {
+      const eventTarget = event.target;
+      if (!eventTarget || !("result" in eventTarget)) {
+        console.error("getFromDatabase: event.target is invalid", eventTarget);
+        reject(event);
+        return;
+      }
+      const item = eventTarget.result;
+      if (typeGuard(item)) {
+        resolve(item);
+      } else if (item === null || item === void 0) {
+        resolve(item);
+      } else {
+        console.error("getFromDatabase: event.target.result is invalid", item);
+        reject(event);
+      }
+    };
+    request.onerror = (event) => {
+      reject(event);
+    };
+  });
+}
+
+// ../novel-bookmark/src/typeGuard.ts
 function isBookmark(data) {
   if (typeof data !== "object" || data === null) {
     return false;
@@ -121,16 +237,24 @@ function isBookmark(data) {
 }
 
 // ../novel-bookmark/src/isBookmarked.ts
-function isBookmarked() {
-  const currentBookmarks = getBookmarks();
-  return currentBookmarks.some(
-    (bookmark) => bookmark.url === window.location.href
-  );
+async function isBookmarked(url) {
+  const bookmark = await getFromDatabase(url, isBookmark);
+  return !!bookmark;
+}
+
+// ../novel-bookmark/src/getBookmarks.ts
+async function getBookmarks() {
+  return getAllFromDatabase(isBookmark).catch((event) => {
+    console.error("getBookmarks error", event);
+    return [];
+  });
 }
 
 // ../novel-bookmark/src/addBookmark.ts
-function addBookmark(id) {
-  const currentBookmarks = getBookmarks();
+async function addBookmark() {
+  const alreadyBookmarked = await isBookmarked(window.location.href);
+  if (alreadyBookmarked) return;
+  const currentBookmarks = await getBookmarks();
   if (currentBookmarks.length >= MAX_BOOKMARKS) {
     return;
   }
@@ -146,25 +270,20 @@ function addBookmark(id) {
       ) ?? "0"
     )
   );
-  currentBookmarks.push({
+  await addToDatabase({
     title: document.title,
     url: window.location.href,
     id: intersectingIds.length > 0 ? `${NOVEL_BOOKMARK_P_ID_PREFIX}${Math.min(...intersectingIds)}` : void 0
+  }).catch((event) => {
+    console.error("addToDatabase error", event);
   });
-  setBookmarkToStorage(currentBookmarks);
 }
 
 // ../novel-bookmark/src/removeBookmark.ts
-function removeBookmark(bookmark) {
-  const currentBookmarks = getBookmarks();
-  const filteredBookmarks = currentBookmarks.filter(
-    (currentBookmark) => currentBookmark.url !== (bookmark ? bookmark.url : window.location.href)
-  );
-  if (filteredBookmarks.length > 0) {
-    setBookmarkToStorage(filteredBookmarks);
-    return;
-  }
-  removeBookmarkFromStorage();
+async function removeBookmark(url) {
+  const alreadyBookmarked = await isBookmarked(url);
+  if (!alreadyBookmarked) return;
+  await deleteFromDatabase(url);
 }
 
 // ../novel-bookmark/src/onClickBookmarkLink.ts
@@ -212,7 +331,7 @@ var BookmarkButtonId = "NovelBookmarkButton";
 var BookmarkListId = "NovelBookmarkList";
 
 // src/createBookmarkButton.ts
-function createBookmarkButton({
+async function createBookmarkButton({
   parentElement = document.body,
   className = "NovelBookmarkButton",
   bookmarkedText = "Remove Bookmark",
@@ -223,39 +342,46 @@ function createBookmarkButton({
   button.type = "button";
   button.id = BookmarkButtonId;
   button.classList.add(className);
-  const bookmarked = isBookmarked();
+  const bookmarked = await isBookmarked(window.location.href);
   button.textContent = bookmarked ? bookmarkedText : notBookmarkedText;
   button.dataset.bookmarked = bookmarked ? "true" : "false";
   button.addEventListener("click", () => {
-    if (isBookmarked()) {
-      removeBookmark();
-      button.textContent = notBookmarkedText;
-      button.dataset.bookmarked = "false";
-    } else {
-      addBookmark();
-      button.textContent = bookmarkedText;
-      button.dataset.bookmarked = "true";
-    }
-    onClick?.();
+    isBookmarked(window.location.href).then((isBookmarked2) => {
+      if (isBookmarked2) {
+        removeBookmark(window.location.href).then(() => {
+          button.textContent = notBookmarkedText;
+          button.dataset.bookmarked = "false";
+          onClick?.();
+        });
+      } else {
+        addBookmark().then(() => {
+          console.log("bookmarked!");
+          button.textContent = bookmarkedText;
+          button.dataset.bookmarked = "true";
+          onClick?.();
+        });
+      }
+    });
   });
   parentElement.appendChild(button);
 }
 
 // src/createBookmarkList.ts
-function onRemoveButtonClick({
+async function onRemoveButtonClick({
   bookmark,
   notBookmarkedText = "Add Bookmark",
   ...props
 }) {
-  removeBookmark(bookmark);
+  await removeBookmark(bookmark.url);
   const bookmarkButton = document.getElementById(BookmarkButtonId);
-  if (bookmarkButton && !isBookmarked()) {
+  const bookmarked = await isBookmarked(window.location.href);
+  if (bookmarkButton && !bookmarked) {
     bookmarkButton.textContent = notBookmarkedText;
     bookmarkButton.dataset.bookmarked = "false";
   }
-  createBookmarkList({ notBookmarkedText, ...props });
+  await createBookmarkList({ notBookmarkedText, ...props });
 }
-function createBookmarkList({
+async function createBookmarkList({
   parentElement = document.body,
   className = "NovelBookmarkList",
   noBookmarkText = "No bookmarks",
@@ -263,7 +389,7 @@ function createBookmarkList({
   ...props
 }) {
   document.getElementById(BookmarkListId)?.remove();
-  const bookmarks = getBookmarks();
+  const bookmarks = await getBookmarks();
   const div = document.createElement("div");
   div.id = BookmarkListId;
   div.classList.add(className);
