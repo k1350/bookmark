@@ -97,8 +97,7 @@ function removeBookmarkFromStorage() {
 // ../novel-bookmark/src/scrollToParagraph.ts
 function scrollToParagraph() {
   const id = getParagraphIdFromStorage();
-  if (!id)
-    return;
+  if (!id) return;
   const element = document.querySelector(
     `[${NOVEL_BOOKMARK_P_DATA_NAME}="${id}"]`
   );

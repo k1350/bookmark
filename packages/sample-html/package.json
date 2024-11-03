@@ -1,9 +1,9 @@
 {
   "name": "packages-sample-html",
   "version": "0.0.1",
-  "packageManager": "bun@1.1.8",
+  "packageManager": "bun@1.1.34",
   "scripts": {
     "dev": "bun --hot run server.js",
-    "lint": "biome check --apply ."
+    "lint": "biome check --write ."
   }
 }
