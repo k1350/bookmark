@@ -1,14 +1,4 @@
-export type CreateBookmarkButtonProps = {
-  /**
-   * ブックマークボタンを追加する親要素
-   * @default document.body
-   */
-  parentElement?: HTMLElement;
-  /**
-   * 作成したブックマークボタンに適用するクラス名
-   * @default "NovelBookmarkButton"
-   */
-  className?: string;
+type BookmarkButtonProps = {
   /**
    * ブックマーク済みのときのブックマークボタンのテキスト
    * @default "Remove Bookmark"
@@ -19,23 +9,20 @@ export type CreateBookmarkButtonProps = {
    * @default "Add Bookmark"
    */
   notBookmarkedText?: string;
+};
+
+export type CreateBookmarkButtonProps = BookmarkButtonProps & {
   /**
    * ボタン押下後に実行する追加処理
    */
   onClick?: () => void;
 };
 
-export type CreateBookmarkListProps = {
-  /**
-   * ブックマーク一覧を追加する親要素
-   * @default document.body
-   */
-  parentElement?: HTMLElement;
-  /**
-   * 作成したブックマーク一覧に適用するクラス名
-   * @default "NovelBookmarkList"
-   */
-  className?: string;
+export type updateBookmarkButtonProps = BookmarkButtonProps & {
+  element: HTMLButtonElement;
+};
+
+type BookmarkListProps = {
   /**
    * ブックマークが存在しないときのテキスト
    * @default "No bookmarks"
@@ -47,8 +34,32 @@ export type CreateBookmarkListProps = {
    */
   removeBookmarkButtonText?: string;
   /**
-   * ブックマークしていないときのブックマークボタンのテキスト
-   * @default "Add Bookmark"
+   * ブックマーク削除ボタン押下時の処理
    */
-  notBookmarkedText?: string;
+  onClickRemoveBookmarkButton?: () => void;
+};
+
+export type CreateBookmarkListProps = BookmarkListProps;
+
+export type UpdateBookmarkListProps = BookmarkListProps & {
+  element: HTMLDivElement;
+};
+
+export type CreateListProps = CreateBookmarkListProps & {
+  parentElement: HTMLElement;
+  className?: string;
+};
+
+export type CreateButtonProps = CreateBookmarkButtonProps & {
+  parentElement: HTMLElement;
+  className?: string;
+};
+
+export type CreateButtonAndListProps = {
+  buttonProps: CreateButtonProps & { className: string };
+  listProps: CreateListProps & { className: string };
+};
+
+export type OnClickRemoveBookmarkButtonProps = BookmarkButtonProps & {
+  buttonClassName: string;
 };

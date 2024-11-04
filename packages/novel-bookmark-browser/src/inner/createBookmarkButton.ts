@@ -3,26 +3,24 @@ import {
   isBookmarked,
   removeBookmark,
 } from "novel-bookmark/index.js";
-import { BookmarkButtonId } from "./constants.js";
-import type { CreateBookmarkButtonProps } from "./types.js";
+import type { CreateBookmarkButtonProps } from "../types.js";
+import { updateBookmarkButton } from "./updateBookmarkButton.js";
 
 /**
  * ブックマークボタンを作成する
  */
 export async function createBookmarkButton({
-  parentElement = document.body,
-  className = "NovelBookmarkButton",
   bookmarkedText = "Remove Bookmark",
   notBookmarkedText = "Add Bookmark",
   onClick,
-}: CreateBookmarkButtonProps) {
+}: CreateBookmarkButtonProps): Promise<HTMLButtonElement> {
   const button = document.createElement("button");
   button.type = "button";
-  button.id = BookmarkButtonId;
-  button.classList.add(className);
-  const bookmarked = await isBookmarked(window.location.href);
-  button.textContent = bookmarked ? bookmarkedText : notBookmarkedText;
-  button.dataset.bookmarked = bookmarked ? "true" : "false";
+  await updateBookmarkButton({
+    element: button,
+    bookmarkedText,
+    notBookmarkedText,
+  });
 
   button.addEventListener("click", () => {
     isBookmarked(window.location.href).then((isBookmarked) => {
@@ -41,6 +39,5 @@ export async function createBookmarkButton({
       }
     });
   });
-
-  parentElement.appendChild(button);
+  return button;
 }
