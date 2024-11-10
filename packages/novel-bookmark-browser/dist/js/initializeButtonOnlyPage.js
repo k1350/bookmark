@@ -230,35 +230,10 @@ var BOOKMARK_BUTTON_CLASS = "novel-bookmark__button";
 
 // src/inner/initialize.ts
 function initialize() {
-  let disconnect = null;
-  if (document.readyState !== "loading") {
-    disconnect = observe({ wrapperClass: CONTAILNER_CLASS });
-  } else {
-    document.addEventListener("readystatechange", () => {
-      if (document.readyState === "interactive") {
-        disconnect = observe({ wrapperClass: CONTAILNER_CLASS });
-      }
-    });
-  }
-  if (document.readyState === "complete") {
-    scrollToParagraph();
-  } else {
-    document.addEventListener("readystatechange", () => {
-      if (document.readyState === "complete") {
-        scrollToParagraph();
-      }
-    });
-  }
-  window.addEventListener(
-    "beforeunload",
-    () => {
-      if (disconnect) {
-        disconnect();
-        disconnect = null;
-      }
-    },
-    false
-  );
+  const disconnect = observe({ wrapperClass: CONTAILNER_CLASS });
+  if (!disconnect) return;
+  scrollToParagraph();
+  window.addEventListener("beforeunload", () => disconnect(), false);
 }
 
 // src/inner/updateBookmarkButton.ts
