@@ -204,10 +204,4 @@ async function initializeBookmarkList() {
 }
 
 // src/initializeListOnlyPage.ts
-if (document.readyState !== "loading") {
-  initializeBookmarkList();
-} else {
-  document.addEventListener("DOMContentLoaded", () => {
-    initializeBookmarkList();
-  });
-}
+initializeBookmarkList();

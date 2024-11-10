@@ -360,10 +360,4 @@ async function initializeBookmarkButton({
 
 // src/initializeButtonOnlyPage.ts
 initialize();
-if (document.readyState !== "loading") {
-  initializeBookmarkButton({});
-} else {
-  document.addEventListener("DOMContentLoaded", () => {
-    initializeBookmarkButton({});
-  });
-}
+initializeBookmarkButton({});
