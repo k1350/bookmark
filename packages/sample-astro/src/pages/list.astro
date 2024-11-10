@@ -1,0 +1,12 @@
+---
+import { ListPage } from "../components/Page/ListPage";
+import Layout from "../components/layout.astro";
+---
+
+<Layout title="List">
+  <div>
+    <a href="/">Page1</a>
+    <a href="/2">Page2</a>
+  </div>
+  <ListPage title="ブックマーク一覧だけのページ" client:load />
+</Layout>

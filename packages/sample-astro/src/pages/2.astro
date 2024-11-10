@@ -1,11 +1,12 @@
 ---
-import { Page } from "../components/Page";
+import { BrPage } from "../components/Page/BrPage";
 import Layout from "../components/layout.astro";
 ---
 
 <Layout title="Page2">
   <div>
     <a href="/">Page1</a>
+    <a href="/list">List</a>
   </div>
-  <Page title="サンプル本文2" client:load />
+  <BrPage title="Brで区切ったページ" client:load />
 </Layout>

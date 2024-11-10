@@ -1,11 +1,12 @@
 ---
-import { Page } from "../components/Page";
+import { ParagraphPage } from "../components/Page/ParagraphPage";
 import Layout from "../components/layout.astro";
 ---
 
 <Layout title="Page1">
   <div>
     <a href="/2">Page2</a>
+    <a href="/list">List</a>
   </div>
-  <Page title="サンプル本文" client:load />
+  <ParagraphPage title="Paragraphで区切ったページ" client:load />
 </Layout>
