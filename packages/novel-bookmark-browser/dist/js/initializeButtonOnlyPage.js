@@ -5,13 +5,9 @@ var NOVEL_BOOKMARK_P_DATA_NAME = "data-novel-bookmark-id";
 var NOVEL_BOOKMARK_INTERSECTING_DATA_NAME = "data-novel-bookmark-intersecting";
 
 // ../novel-bookmark/src/observe.ts
-function observe({
-  paragraphTag = "p",
-  ...props
-}) {
+function observe({ wrapperClass }) {
   const io = setIdAndIntersectionObserver({
-    ...props,
-    paragraphTag
+    wrapperClass
   });
   if (!io) {
     return null;
@@ -19,22 +15,28 @@ function observe({
   return () => io.disconnect();
 }
 function setIdAndIntersectionObserver({
-  wrapperClass,
-  paragraphTag
+  wrapperClass
 }) {
   const wrapperElements = document.getElementsByClassName(wrapperClass);
   if (wrapperElements.length === 0) {
     return null;
   }
   const element = wrapperElements[0];
-  const paragraphs = element.getElementsByTagName(paragraphTag);
+  const paragraphs = element.children;
   for (let index = 0; index < paragraphs.length; index++) {
     const id = `${NOVEL_BOOKMARK_P_ID_PREFIX}${index}`;
-    paragraphs[index].dataset.novelBookmarkId = id;
+    const paragraph = paragraphs[index];
+    if (!(paragraph instanceof HTMLElement)) {
+      continue;
+    }
+    paragraph.dataset.novelBookmarkId = id;
   }
   const intersectionObserver = new IntersectionObserver((entries) => {
     for (const entry of entries) {
       const target = entry.target;
+      if (!(target instanceof HTMLElement)) {
+        continue;
+      }
       const id = target.dataset.novelBookmarkId;
       if (!id) {
         continue;
@@ -253,14 +255,14 @@ async function addBookmark() {
     document.querySelectorAll(
       `[${NOVEL_BOOKMARK_INTERSECTING_DATA_NAME}="true"]`
     )
-  ).map(
-    (element) => Number.parseInt(
-      element.dataset.novelBookmarkId?.replace(
-        "element-p-",
-        ""
-      ) ?? "0"
-    )
-  );
+  ).map((element) => {
+    if (!(element instanceof HTMLElement)) {
+      return 0;
+    }
+    return Number.parseInt(
+      element.dataset.novelBookmarkId?.replace("element-p-", "") ?? "0"
+    );
+  });
   await addToDatabase({
     title: document.title,
     url: window.location.href,

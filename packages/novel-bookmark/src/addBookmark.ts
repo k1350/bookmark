@@ -20,14 +20,14 @@ export async function addBookmark(): Promise<void> {
     document.querySelectorAll(
       `[${NOVEL_BOOKMARK_INTERSECTING_DATA_NAME}="true"]`,
     ),
-  ).map((element) =>
-    Number.parseInt(
-      (element as HTMLElement).dataset.novelBookmarkId?.replace(
-        "element-p-",
-        "",
-      ) ?? "0",
-    ),
-  );
+  ).map((element) => {
+    if (!(element instanceof HTMLElement)) {
+      return 0;
+    }
+    return Number.parseInt(
+      element.dataset.novelBookmarkId?.replace("element-p-", "") ?? "0",
+    );
+  });
 
   await addToDatabase({
     title: document.title,
