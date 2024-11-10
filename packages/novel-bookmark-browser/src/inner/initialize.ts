@@ -1,14 +1,15 @@
 import { observe, scrollToParagraph } from "novel-bookmark/index.js";
+import { CONTAILNER_CLASS } from "../constants";
 
 export function initialize() {
   let disconnect: (() => void) | null = null;
 
   if (document.readyState !== "loading") {
-    disconnect = observe({ wrapperClass: "Novel" });
+    disconnect = observe({ wrapperClass: CONTAILNER_CLASS });
   } else {
     document.addEventListener("readystatechange", () => {
       if (document.readyState === "interactive") {
-        disconnect = observe({ wrapperClass: "Novel" });
+        disconnect = observe({ wrapperClass: CONTAILNER_CLASS });
       }
     });
   }

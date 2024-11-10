@@ -8,7 +8,7 @@
   "scripts": {
     "prepare": "lefthook install",
     "build:npm": "bun run --filter @k1350/novel-bookmark build",
-    "build:browser": "bun run --filter packages-novel-bookmark-browser build && cp ./packages/novel-bookmark-browser/dist/index.min.js ./packages/sample-html/public/js/novel-bookmark/index.min.js",
+    "build:browser": "bun run --filter packages-novel-bookmark-browser build && cp ./packages/novel-bookmark-browser/dist/js/*.min.js ./packages/sample-html/public/js/novel-bookmark && cp ./packages/novel-bookmark-browser/dist/css/*.css ./packages/sample-html/public/css/novel-bookmark",
     "dev:astro": "bun run --filter packages-sample-astro dev",
     "dev:html": "bun run --filter packages-sample-html dev",
     "lint": "bun run --filter '*' lint && biome check --write ."

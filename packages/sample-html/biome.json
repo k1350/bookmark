@@ -1,6 +1,9 @@
 {
   "extends": ["../../biome.base.json"],
   "files": {
-    "ignore": ["public/js/novel-bookmark/*.js"]
+    "ignore": [
+      "public/js/novel-bookmark/*.js",
+      "public/css/novel-bookmark/*.css"
+    ]
   }
 }

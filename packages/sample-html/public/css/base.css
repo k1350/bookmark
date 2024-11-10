@@ -1,12 +1,12 @@
 @charset "utf-8";
 
-.BookmarkButton {
+.novel-bookmark__button {
   position: fixed;
   bottom: 100px;
   left: 0;
 }
 
-.Novel p {
+.novel-bookmark__container p {
   margin: 0;
   margin-bottom: 0.5rem;
 }

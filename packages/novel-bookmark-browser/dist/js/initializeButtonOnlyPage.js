@@ -50,12 +50,6 @@ function setIdAndIntersectionObserver({
 
 // ../novel-bookmark/src/storage.ts
 var TEMP_STORAGE_ID = "novel-bookmark-p-id";
-function setItemToStorage({ type, key, value }) {
-  if (type === "local") {
-    return localStorage.setItem(key, value);
-  }
-  return sessionStorage.setItem(key, value);
-}
 function getItemFromStorage({
   type,
   key
@@ -70,9 +64,6 @@ function removeItemFromStorage({ type, key }) {
     return localStorage.removeItem(key);
   }
   return sessionStorage.removeItem(key);
-}
-function setParagraphIdToStorage(id) {
-  setItemToStorage({ type: "session", key: TEMP_STORAGE_ID, value: id });
 }
 function getParagraphIdFromStorage() {
   const id = getItemFromStorage({ type: "session", key: TEMP_STORAGE_ID });
@@ -286,22 +277,19 @@ async function removeBookmark(url) {
   await deleteFromDatabase(url);
 }
 
-// ../novel-bookmark/src/onClickBookmarkLink.ts
-function onClickBookmarkLink(bookmark) {
-  if (bookmark.id) {
-    setParagraphIdToStorage(bookmark.id);
-  }
-}
+// src/constants.ts
+var CONTAILNER_CLASS = "novel-bookmark__container";
+var BOOKMARK_BUTTON_CLASS = "novel-bookmark__button";
 
-// src/initialize.ts
+// src/inner/initialize.ts
 function initialize() {
   let disconnect = null;
   if (document.readyState !== "loading") {
-    disconnect = observe({ wrapperClass: "Novel" });
+    disconnect = observe({ wrapperClass: CONTAILNER_CLASS });
   } else {
     document.addEventListener("readystatechange", () => {
       if (document.readyState === "interactive") {
-        disconnect = observe({ wrapperClass: "Novel" });
+        disconnect = observe({ wrapperClass: CONTAILNER_CLASS });
       }
     });
   }
@@ -328,40 +316,37 @@ function initialize() {
 
 // src/inner/updateBookmarkButton.ts
 async function updateBookmarkButton({
-  element,
-  bookmarkedText = "Remove Bookmark",
-  notBookmarkedText = "Add Bookmark"
+  element
 }) {
   const bookmarked = await isBookmarked(window.location.href);
-  element.textContent = bookmarked ? bookmarkedText : notBookmarkedText;
   element.dataset.bookmarked = bookmarked ? "true" : "false";
   return element;
 }
 
-// src/inner/createBookmarkButton.ts
-async function createBookmarkButton({
-  bookmarkedText = "Remove Bookmark",
-  notBookmarkedText = "Add Bookmark",
+// src/inner/initializeBookmarkButton.ts
+async function initializeBookmarkButton({
   onClick
 }) {
-  const button = document.createElement("button");
-  button.type = "button";
+  const buttons = document.getElementsByClassName(BOOKMARK_BUTTON_CLASS);
+  if (buttons.length === 0) {
+    throw new Error("novel-bookmark__button is not found");
+  }
+  const button = buttons[0];
+  if (!(button instanceof HTMLElement)) {
+    throw new Error("novel-bookmark__button is not HTMLElement");
+  }
   await updateBookmarkButton({
-    element: button,
-    bookmarkedText,
-    notBookmarkedText
+    element: button
   });
   button.addEventListener("click", () => {
     isBookmarked(window.location.href).then((isBookmarked2) => {
       if (isBookmarked2) {
         removeBookmark(window.location.href).then(() => {
-          button.textContent = notBookmarkedText;
           button.dataset.bookmarked = "false";
           onClick?.();
         });
       } else {
         addBookmark().then(() => {
-          button.textContent = bookmarkedText;
           button.dataset.bookmarked = "true";
           onClick?.();
         });
@@ -371,194 +356,12 @@ async function createBookmarkButton({
   return button;
 }
 
-// src/createButton.ts
-async function createButton({
-  parentElement,
-  className,
-  ...props
-}) {
-  const button = await createBookmarkButton(props);
-  if (className) {
-    button.classList.add(className);
-  }
-  parentElement.appendChild(button);
-  return button;
-}
-
-// src/inner/updateBookmarkList.ts
-async function updateBookmarkList({
-  element,
-  noBookmarkText = "No bookmarks",
-  removeBookmarkButtonText = "Remove",
-  onClickRemoveBookmarkButton: onClickRemoveBookmarkButton2
-}) {
-  const bookmarks = await getBookmarks();
-  if (bookmarks.length === 0) {
-    let p = null;
-    for (const child of element.children) {
-      if (child instanceof HTMLUListElement) {
-        element.removeChild(child);
-      } else if (child instanceof HTMLParagraphElement) {
-        p = child;
-      }
-    }
-    if (p === null) {
-      p = document.createElement("p");
-      element.appendChild(p);
-    }
-    p.textContent = noBookmarkText;
-    element.dataset.empty = "true";
-    return element;
-  }
-  element.dataset.empty = "false";
-  let list = null;
-  for (const child of element.children) {
-    if (child instanceof HTMLParagraphElement) {
-      element.removeChild(child);
-    } else if (child instanceof HTMLUListElement) {
-      list = child;
-    }
-  }
-  if (list === null) {
-    list = document.createElement("ul");
-    element.appendChild(list);
-  }
-  for (const child of list.children) {
-    if (child instanceof HTMLLIElement) {
-      const link = child.querySelector("a");
-      if (link instanceof HTMLAnchorElement) {
-        const url = link.href;
-        if (!bookmarks.some((bookmark) => bookmark.url === url)) {
-          list.removeChild(child);
-        }
-      }
-    }
-  }
-  for (const bookmark of bookmarks) {
-    const url = bookmark.url;
-    if (!existsBookmark(url, list)) {
-      const item = document.createElement("li");
-      const link = document.createElement("a");
-      link.href = bookmark.url;
-      link.textContent = bookmark.title;
-      link.addEventListener("click", () => {
-        onClickBookmarkLink(bookmark);
-      });
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = removeBookmarkButtonText;
-      button.addEventListener("click", () => {
-        removeBookmark(bookmark.url).then(() => {
-          updateBookmarkList({
-            element,
-            noBookmarkText,
-            removeBookmarkButtonText
-          }).then(() => {
-            onClickRemoveBookmarkButton2?.();
-          });
-        });
-      });
-      item.appendChild(link);
-      item.appendChild(button);
-      list.appendChild(item);
-    }
-  }
-  return element;
-}
-function existsBookmark(url, list) {
-  return Array.from(list.children).some((child) => {
-    if (child instanceof HTMLLIElement) {
-      const link = child.querySelector("a");
-      if (link instanceof HTMLAnchorElement) {
-        return link.href === url;
-      }
-    }
-    return false;
+// src/initializeButtonOnlyPage.ts
+initialize();
+if (document.readyState !== "loading") {
+  initializeBookmarkButton({});
+} else {
+  document.addEventListener("DOMContentLoaded", () => {
+    initializeBookmarkButton({});
   });
 }
-
-// src/inner/createBookmarkList.ts
-async function createBookmarkList(props) {
-  const div = document.createElement("div");
-  await updateBookmarkList({
-    element: div,
-    ...props
-  });
-  return div;
-}
-
-// src/createList.ts
-async function createList({
-  parentElement,
-  className,
-  ...props
-}) {
-  const element = await createBookmarkList(props);
-  if (className) {
-    element.classList.add(className);
-  }
-  parentElement.appendChild(element);
-  return element;
-}
-
-// src/createButtonAndList.ts
-async function createButtonAndList({
-  buttonProps,
-  listProps
-}) {
-  const button = await createButton({
-    ...buttonProps,
-    onClick: () => onClickBookmarkButton({ buttonProps, listProps })
-  });
-  const list = await createList({
-    ...listProps,
-    onClickRemoveBookmarkButton: () => onClickRemoveBookmarkButton({
-      buttonClassName: buttonProps.className,
-      ...buttonProps
-    })
-  });
-  return { button, list };
-}
-function onClickBookmarkButton({
-  buttonProps: { className: buttonClassName, ...buttonProps },
-  listProps: { className: listClassName, ...listProps }
-}) {
-  const bookmarkList = document.querySelector(`.${listClassName}`);
-  if (bookmarkList instanceof HTMLDivElement) {
-    updateBookmarkList({
-      element: bookmarkList,
-      ...listProps,
-      onClickRemoveBookmarkButton: () => {
-        const bookmarkButton = document.querySelector(`.${buttonClassName}`);
-        if (bookmarkButton instanceof HTMLButtonElement) {
-          updateBookmarkButton({
-            element: bookmarkButton,
-            ...buttonProps
-          });
-        }
-      }
-    });
-  }
-}
-function onClickRemoveBookmarkButton({
-  buttonClassName,
-  ...props
-}) {
-  const bookmarkButton = document.querySelector(`.${buttonClassName}`);
-  if (bookmarkButton instanceof HTMLButtonElement) {
-    updateBookmarkButton({
-      element: bookmarkButton,
-      ...props
-    });
-  }
-}
-export {
-  createBookmarkButton,
-  createBookmarkList,
-  createButton,
-  createButtonAndList,
-  createList,
-  initialize,
-  updateBookmarkButton,
-  updateBookmarkList
-};

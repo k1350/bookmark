@@ -1,53 +1,31 @@
-import {
-  getBookmarks,
-  onClickBookmarkLink,
-  removeBookmark,
-} from "novel-bookmark/index";
+import { getBookmarks, onClickBookmarkLink } from "novel-bookmark/index";
+import { BOOKMARK_LISTITEM_LINK_CLASS } from "../constants";
 import type { UpdateBookmarkListProps } from "../types";
 
 export async function updateBookmarkList({
   element,
-  noBookmarkText = "No bookmarks",
-  removeBookmarkButtonText = "Remove",
-  onClickRemoveBookmarkButton,
-}: UpdateBookmarkListProps): Promise<HTMLDivElement> {
+}: UpdateBookmarkListProps): Promise<HTMLElement> {
   const bookmarks = await getBookmarks();
   if (bookmarks.length === 0) {
-    let p: HTMLParagraphElement | null = null;
-    for (const child of element.children) {
-      if (child instanceof HTMLUListElement) {
-        element.removeChild(child);
-      } else if (child instanceof HTMLParagraphElement) {
-        p = child;
-      }
-    }
-    if (p === null) {
-      p = document.createElement("p");
-      element.appendChild(p);
-    }
-    p.textContent = noBookmarkText;
     element.dataset.empty = "true";
     return element;
   }
 
   element.dataset.empty = "false";
-  let list: HTMLUListElement | null = null;
-  for (const child of element.children) {
-    if (child instanceof HTMLParagraphElement) {
-      element.removeChild(child);
-    } else if (child instanceof HTMLUListElement) {
-      list = child;
-    }
+  const lists = element.getElementsByTagName("ul");
+  if (lists.length === 0) {
+    throw new Error("ul in novel-bookmark__list-container is not found");
   }
-  if (list === null) {
-    list = document.createElement("ul");
-    element.appendChild(list);
-  }
+  const list = lists[0];
 
   // 既存のリストに存在するがブックマークには存在しないものを削除する
   for (const child of list.children) {
     if (child instanceof HTMLLIElement) {
-      const link = child.querySelector("a");
+      const links = child.getElementsByTagName("a");
+      if (links.length === 0) {
+        continue;
+      }
+      const link = links[0];
       if (link instanceof HTMLAnchorElement) {
         const url = link.href;
         if (!bookmarks.some((bookmark) => bookmark.url === url)) {
@@ -65,25 +43,11 @@ export async function updateBookmarkList({
       const link = document.createElement("a");
       link.href = bookmark.url;
       link.textContent = bookmark.title;
+      link.classList.add(BOOKMARK_LISTITEM_LINK_CLASS);
       link.addEventListener("click", () => {
         onClickBookmarkLink(bookmark);
       });
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = removeBookmarkButtonText;
-      button.addEventListener("click", () => {
-        removeBookmark(bookmark.url).then(() => {
-          updateBookmarkList({
-            element,
-            noBookmarkText,
-            removeBookmarkButtonText,
-          }).then(() => {
-            onClickRemoveBookmarkButton?.();
-          });
-        });
-      });
       item.appendChild(link);
-      item.appendChild(button);
       list.appendChild(item);
     }
   }
@@ -94,7 +58,11 @@ export async function updateBookmarkList({
 function existsBookmark(url: string, list: HTMLUListElement): boolean {
   return Array.from(list.children).some((child) => {
     if (child instanceof HTMLLIElement) {
-      const link = child.querySelector("a");
+      const links = child.getElementsByTagName("a");
+      if (links.length === 0) {
+        return false;
+      }
+      const link = links[0];
       if (link instanceof HTMLAnchorElement) {
         return link.href === url;
       }

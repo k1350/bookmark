@@ -1,0 +1,24 @@
+.novel-bookmark__button[data-bookmarked="undefined"] {
+  display: none;
+}
+
+.novel-bookmark__button[data-bookmarked="true"] .novel-bookmark__button--add {
+  display: none;
+}
+
+.novel-bookmark__button[data-bookmarked="false"]
+  .novel-bookmark__button--remove {
+  display: none;
+}
+
+.novel-bookmark__list-container[data-empty="undefined"] {
+  display: none;
+}
+
+.novel-bookmark__list-container[data-empty="true"] .novel-bookmark__list {
+  display: none;
+}
+
+.novel-bookmark__list-container[data-empty="false"] .novel-bookmark__empty {
+  display: none;
+}

@@ -5,7 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ページ2 | サンプルプロジェクト</title>
-  <script src="./js/buttonOnlyInit.js" type="module"></script>
+  <script src="./js/novel-bookmark/initializeButtonOnlyPage.min.js" type="module"></script>
+  <link rel="stylesheet" href="./css/novel-bookmark/novel-bookmark.css" type="text/css" />
   <link rel="stylesheet" href="./css/base.css" type="text/css" />
 </head>
 
@@ -21,7 +22,7 @@
     </div>
     <article>
       <h1>サンプル本文</h1>
-      <div class="Novel">
+      <div class="novel-bookmark__container">
         <p>　これはサンプル本文です。ページ2です。1行目。</p>
         <p>　これはサンプル本文です。ページ2です。2行目。</p>
         <p>　これはサンプル本文です。ページ2です。3行目。</p>
@@ -54,6 +55,10 @@
         <p>　これはサンプル本文です。ページ2です。30行目。</p>
       </div>
     </article>
+    <button type="button" class="novel-bookmark__button" data-bookmarked="undefined">
+      <span class="novel-bookmark__button--add">ブックマークする</span>
+      <span class="novel-bookmark__button--remove">ブックマークを解除する</span>
+    </button>
   </main>
 </body>
 

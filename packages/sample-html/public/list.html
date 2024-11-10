@@ -5,7 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>リスト | サンプルプロジェクト</title>
-  <script src="./js/listOnlyInit.js" type="module"></script>
+  <script src="./js/novel-bookmark/initializeListOnlyPage.min.js" type="module"></script>
+  <link rel="stylesheet" href="./css/novel-bookmark/novel-bookmark.css" type="text/css" />
   <link rel="stylesheet" href="./css/base.css" type="text/css" />
 </head>
 
@@ -19,6 +20,11 @@
         <p>ページ2へ</p>
       </a>
     </div>
+    <section class="novel-bookmark__list-container" data-empty="undefined">
+      <h1>ブックマーク一覧</h1>
+      <ul class="novel-bookmark__list"></ul>
+      <p class="novel-bookmark__empty">ブックマークはありません</p>
+    </section>
   </main>
 </body>
 
