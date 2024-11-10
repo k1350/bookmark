@@ -5,7 +5,6 @@ var BOOKMARK_LIST_CONTAINER_CLASS = "novel-bookmark__list-container";
 var BOOKMARK_LISTITEM_LINK_CLASS = "novel-bookmark__listitem--link";
 
 // ../novel-bookmark/src/constants.ts
-var MAX_BOOKMARKS = 100;
 var NOVEL_BOOKMARK_P_ID_PREFIX = "element-p-";
 var NOVEL_BOOKMARK_P_DATA_NAME = "data-novel-bookmark-id";
 var NOVEL_BOOKMARK_INTERSECTING_DATA_NAME = "data-novel-bookmark-intersecting";
@@ -250,22 +249,10 @@ async function isBookmarked(url) {
   return !!bookmark;
 }
 
-// ../novel-bookmark/src/getBookmarks.ts
-async function getBookmarks() {
-  return getAllFromDatabase(isBookmark).catch((event) => {
-    console.error("getBookmarks error", event);
-    return [];
-  });
-}
-
 // ../novel-bookmark/src/addBookmark.ts
 async function addBookmark() {
   const alreadyBookmarked = await isBookmarked(window.location.href);
   if (alreadyBookmarked) return;
-  const currentBookmarks = await getBookmarks();
-  if (currentBookmarks.length >= MAX_BOOKMARKS) {
-    return;
-  }
   const intersectingIds = Array.from(
     document.querySelectorAll(
       `[${NOVEL_BOOKMARK_INTERSECTING_DATA_NAME}="true"]`
@@ -299,6 +286,14 @@ function onClickBookmarkLink(bookmark) {
   if (bookmark.id) {
     setParagraphIdToStorage(bookmark.id);
   }
+}
+
+// ../novel-bookmark/src/getBookmarks.ts
+async function getBookmarks() {
+  return getAllFromDatabase(isBookmark).catch((event) => {
+    console.error("getBookmarks error", event);
+    return [];
+  });
 }
 
 // src/inner/initialize.ts

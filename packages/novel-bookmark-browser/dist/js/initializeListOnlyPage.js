@@ -107,19 +107,19 @@ function isBookmark(data) {
   return "title" in data && typeof data.title === "string" && "url" in data && typeof data.url === "string";
 }
 
+// ../novel-bookmark/src/onClickBookmarkLink.ts
+function onClickBookmarkLink(bookmark) {
+  if (bookmark.id) {
+    setParagraphIdToStorage(bookmark.id);
+  }
+}
+
 // ../novel-bookmark/src/getBookmarks.ts
 async function getBookmarks() {
   return getAllFromDatabase(isBookmark).catch((event) => {
     console.error("getBookmarks error", event);
     return [];
   });
-}
-
-// ../novel-bookmark/src/onClickBookmarkLink.ts
-function onClickBookmarkLink(bookmark) {
-  if (bookmark.id) {
-    setParagraphIdToStorage(bookmark.id);
-  }
 }
 
 // src/inner/updateBookmarkList.ts

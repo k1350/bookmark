@@ -1,5 +1,4 @@
 // ../novel-bookmark/src/constants.ts
-var MAX_BOOKMARKS = 100;
 var NOVEL_BOOKMARK_P_ID_PREFIX = "element-p-";
 var NOVEL_BOOKMARK_P_DATA_NAME = "data-novel-bookmark-id";
 var NOVEL_BOOKMARK_INTERSECTING_DATA_NAME = "data-novel-bookmark-intersecting";
@@ -152,48 +151,6 @@ async function deleteFromDatabase(key) {
     };
   });
 }
-async function getAllFromDatabase(typeGuard) {
-  const tx = await getTransaction("readonly");
-  return new Promise((resolve, reject) => {
-    const request = tx.objectStore(DB_STORE_NAME).openCursor();
-    const items = [];
-    request.onsuccess = (event) => {
-      const eventTarget = event.target;
-      if (!eventTarget || !("result" in eventTarget)) {
-        console.error(
-          "getAllFromDatabase: event.target is invalid",
-          eventTarget
-        );
-        reject(event);
-        return;
-      }
-      const cursor = eventTarget.result;
-      if (cursor instanceof IDBCursorWithValue) {
-        if (typeGuard(cursor.value)) {
-          items.push(cursor.value);
-          cursor.continue();
-        } else {
-          console.error(
-            "getAllFromDatabase: event.target.result.value is invalid",
-            cursor.value
-          );
-          reject(event);
-        }
-      } else if (cursor === null) {
-        resolve(items);
-      } else {
-        console.error(
-          "getAllFromDatabase: event.target.result is invalid",
-          cursor
-        );
-        reject(event);
-      }
-    };
-    request.onerror = (event) => {
-      reject(event);
-    };
-  });
-}
 async function getFromDatabase(key, typeGuard) {
   const tx = await getTransaction("readonly");
   return new Promise((resolve, reject) => {
@@ -235,22 +192,10 @@ async function isBookmarked(url) {
   return !!bookmark;
 }
 
-// ../novel-bookmark/src/getBookmarks.ts
-async function getBookmarks() {
-  return getAllFromDatabase(isBookmark).catch((event) => {
-    console.error("getBookmarks error", event);
-    return [];
-  });
-}
-
 // ../novel-bookmark/src/addBookmark.ts
 async function addBookmark() {
   const alreadyBookmarked = await isBookmarked(window.location.href);
   if (alreadyBookmarked) return;
-  const currentBookmarks = await getBookmarks();
-  if (currentBookmarks.length >= MAX_BOOKMARKS) {
-    return;
-  }
   const intersectingIds = Array.from(
     document.querySelectorAll(
       `[${NOVEL_BOOKMARK_INTERSECTING_DATA_NAME}="true"]`
