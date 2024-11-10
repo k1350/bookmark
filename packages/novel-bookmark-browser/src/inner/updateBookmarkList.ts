@@ -1,10 +1,16 @@
 import { getBookmarks, onClickBookmarkLink } from "novel-bookmark/index.js";
 import { BOOKMARK_LISTITEM_LINK_CLASS } from "../constants.js";
-import type { UpdateBookmarkListProps } from "../types.js";
 
+type Props = {
+  element: HTMLElement;
+};
+
+/**
+ * ブックマーク一覧を更新する
+ */
 export async function updateBookmarkList({
   element,
-}: UpdateBookmarkListProps): Promise<HTMLElement> {
+}: Props): Promise<HTMLElement> {
   const bookmarks = await getBookmarks();
   if (bookmarks.length === 0) {
     element.dataset.empty = "true";

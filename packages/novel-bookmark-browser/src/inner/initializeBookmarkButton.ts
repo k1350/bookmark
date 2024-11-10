@@ -4,15 +4,21 @@ import {
   removeBookmark,
 } from "novel-bookmark/index.js";
 import { BOOKMARK_BUTTON_CLASS } from "../constants.js";
-import type { CreateBookmarkButtonProps } from "../types.js";
 import { updateBookmarkButton } from "./updateBookmarkButton.js";
+
+type Props = {
+  /**
+   * ボタン押下後に実行する追加処理
+   */
+  onClick?: () => void;
+};
 
 /**
  * ブックマークボタンを初期化する
  */
 export async function initializeBookmarkButton({
   onClick,
-}: CreateBookmarkButtonProps): Promise<HTMLElement> {
+}: Props): Promise<HTMLElement> {
   const buttons = document.getElementsByClassName(BOOKMARK_BUTTON_CLASS);
   if (buttons.length === 0) {
     throw new Error("novel-bookmark__button is not found");
