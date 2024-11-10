@@ -1,5 +1,4 @@
-import { initialize } from "./inner/initialize";
-import { initializeBookmarkButton } from "./inner/initializeBookmarkButton";
+import { initialize, initializeBookmarkButton } from "./inner/index.js";
 
 initialize();
 initializeBookmarkButton({});

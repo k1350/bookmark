@@ -1,3 +1,3 @@
-import { initializeBookmarkList } from "./inner/initializeBookmarkList";
+import { initializeBookmarkList } from "./inner/index.js";
 
 initializeBookmarkList();

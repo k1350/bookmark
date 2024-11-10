@@ -1,6 +1,6 @@
-import { getBookmarks, onClickBookmarkLink } from "novel-bookmark/index";
-import { BOOKMARK_LISTITEM_LINK_CLASS } from "../constants";
-import type { UpdateBookmarkListProps } from "../types";
+import { getBookmarks, onClickBookmarkLink } from "novel-bookmark/index.js";
+import { BOOKMARK_LISTITEM_LINK_CLASS } from "../constants.js";
+import type { UpdateBookmarkListProps } from "../types.js";
 
 export async function updateBookmarkList({
   element,

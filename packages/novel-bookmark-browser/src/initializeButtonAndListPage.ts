@@ -1,8 +1,10 @@
-import { BOOKMARK_LIST_CONTAINER_CLASS } from "./constants";
-import { initialize } from "./inner/initialize";
-import { initializeBookmarkButton } from "./inner/initializeBookmarkButton";
-import { initializeBookmarkList } from "./inner/initializeBookmarkList";
-import { updateBookmarkList } from "./inner/updateBookmarkList";
+import { BOOKMARK_LIST_CONTAINER_CLASS } from "./constants.js";
+import {
+  initialize,
+  initializeBookmarkButton,
+  initializeBookmarkList,
+  updateBookmarkList,
+} from "./inner/index.js";
 
 initialize();
 initializeBookmarkButton({

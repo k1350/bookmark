@@ -1,5 +1,5 @@
-import { isBookmarked } from "novel-bookmark/index";
-import type { updateBookmarkButtonProps } from "../types";
+import { isBookmarked } from "novel-bookmark/index.js";
+import type { updateBookmarkButtonProps } from "../types.js";
 
 export async function updateBookmarkButton({
   element,

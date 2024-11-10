@@ -6,6 +6,7 @@ export default defineConfig({
     "initializeButtonAndListPage.min": "src/initializeButtonAndListPage.ts",
     "initializeButtonOnlyPage.min": "src/initializeButtonOnlyPage.ts",
     "initializeListOnlyPage.min": "src/initializeListOnlyPage.ts",
+    "inner/index.min": "src/inner/index.ts",
   },
   format: ["esm"],
   outDir: "dist/js",

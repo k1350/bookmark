@@ -1,7 +1,3 @@
-// src/constants.ts
-var BOOKMARK_LIST_CONTAINER_CLASS = "novel-bookmark__list-container";
-var BOOKMARK_LISTITEM_LINK_CLASS = "novel-bookmark__listitem--link";
-
 // ../novel-bookmark/src/storage.ts
 var TEMP_STORAGE_ID = "novel-bookmark-p-id";
 function setItemToStorage({ type, key, value }) {
@@ -121,6 +117,10 @@ async function getBookmarks() {
     return [];
   });
 }
+
+// src/constants.ts
+var BOOKMARK_LIST_CONTAINER_CLASS = "novel-bookmark__list-container";
+var BOOKMARK_LISTITEM_LINK_CLASS = "novel-bookmark__listitem--link";
 
 // src/inner/updateBookmarkList.ts
 async function updateBookmarkList({
