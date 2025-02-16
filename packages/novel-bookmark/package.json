@@ -1,6 +1,6 @@
 {
   "name": "@k1350/novel-bookmark",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/k1350/bookmark",
   "description": "A library that allows you to build a bookmark system for your web site.",
   "type": "module",
