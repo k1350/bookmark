@@ -14,7 +14,7 @@
     "lint": "bun run --filter '*' lint && biome check --write ."
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
+    "@biomejs/biome": "^2.1.0",
     "lefthook": "^1.10.10"
   }
 }
