@@ -3,7 +3,7 @@
   "timezone": "Asia/Tokyo",
   "prHourlyLimit": 0,
   "rangeStrategy": "bump",
-  "ignoreDeps": ["npm"],
+  "ignoreDeps": ["npm", "node"],
   "enabledManagers": ["github-actions", "npm"],
   "rebaseWhen": "conflicted",
   "labels": ["dependencies"],
