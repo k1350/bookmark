@@ -1,0 +1,42 @@
+{
+  "extends": ["config:recommended", "group:monorepos"],
+  "timezone": "Asia/Tokyo",
+  "prHourlyLimit": 0,
+  "rangeStrategy": "bump",
+  "ignoreDeps": ["npm"],
+  "enabledManagers": ["github-actions", "npm"],
+  "rebaseWhen": "conflicted",
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "matchManagers": ["npm"],
+      "schedule": ["at any time"]
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "schedule": ["before 5:00am"]
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@types/node"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchPackagePatterns": ["@cdktf/provider-(?!cloudflare)"],
+      "groupName": "cdktf-provider"
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@cdktf/provider-cloudflare"],
+      "groupName": "cloudflare-provider",
+      "matchUpdateTypes": ["minor", "patch"]
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchPackagePatterns": ["@uiw/react-color-.*"],
+      "groupName": "uiw/react-color"
+    }
+  ]
+}
