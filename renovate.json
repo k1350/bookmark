@@ -10,11 +10,11 @@
   "packageRules": [
     {
       "matchManagers": ["npm"],
-      "schedule": ["at any time"]
+      "schedule": ["* * * * *"]
     },
     {
       "matchManagers": ["github-actions"],
-      "schedule": ["before 5:00am"]
+      "schedule": ["* 0-4 * * *"]
     },
     {
       "matchManagers": ["npm"],
@@ -24,7 +24,7 @@
     },
     {
       "matchManagers": ["npm"],
-      "matchPackagePatterns": ["@cdktf/provider-(?!cloudflare)"],
+      "matchPackagePatterns": ["@cdktf/provider-.*"],
       "groupName": "cdktf-provider"
     },
     {
